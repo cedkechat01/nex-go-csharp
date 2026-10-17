@@ -1,0 +1,14 @@
+using System;
+
+namespace NexGoCSharp;
+
+public static class NexHelpers
+{
+    public static uint Sum(byte[] data)
+    {
+        uint sum = 0;
+        foreach (var b in data)
+            sum += b;
+        return sum;
+    }
+}

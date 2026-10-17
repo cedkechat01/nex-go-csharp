@@ -1,0 +1,53 @@
+using System.Collections.Generic;
+
+namespace NexGoCSharp;
+
+public class NexClient
+{
+    private readonly object _sync = new();
+    private byte[] _signatureKey = System.Array.Empty<byte>();
+    private byte[] _sessionKey = System.Array.Empty<byte>();
+    private uint _pid;
+    private string _localStationUrl = string.Empty;
+    private uint _connectionId;
+    private bool _connected;
+    private Counter _sequenceIdIn = new();
+    private Counter _sequenceIdOut = new();
+
+    public byte[] SignatureKey { get => _signatureKey; set => _signatureKey = value ?? System.Array.Empty<byte>(); }
+    public byte[] SessionKey { get => _sessionKey; set => _sessionKey = value ?? System.Array.Empty<byte>(); }
+    public uint Pid { get => _pid; set => _pid = value; }
+    public string LocalStationUrl { get => _localStationUrl; set => _localStationUrl = value ?? string.Empty; }
+    public uint ConnectionId { get => _connectionId; set => _connectionId = value; }
+    public bool Connected { get => _connected; set => _connected = value; }
+    public Counter SequenceIdIn => _sequenceIdIn;
+    public Counter SequenceIdOut => _sequenceIdOut;
+
+    public void Reset()
+    {
+        lock (_sync)
+        {
+            _sequenceIdIn = new Counter(0);
+            _sequenceIdOut = new Counter(0);
+            _connected = false;
+        }
+    }
+}
+
+public class NexServer
+{
+    private readonly List<NexClient> _clients = new();
+
+    public IReadOnlyList<NexClient> Clients => _clients;
+
+    public void AddClient(NexClient client)
+    {
+        if (client != null)
+            _clients.Add(client);
+    }
+
+    public void RemoveClient(NexClient client)
+    {
+        _clients.Remove(client);
+    }
+}
